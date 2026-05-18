@@ -1,4 +1,4 @@
-import { hasFileUnder, hasAnyPath, hasFileMatching } from '../utils.js';
+import { hasAnyPath, hasFileMatching, hasFileUnder, hasFileWithBasenamePattern } from '../utils.js';
 import type { Check } from '../types.js';
 
 const TEST_DIRS = ['test', 'tests', '__tests__', 'spec'];
@@ -13,7 +13,11 @@ const TEST_FILE_SUFFIXES = [
   '.spec.tsx',
   '_test.go',
   '_spec.rb',
-  'test_.py',
+];
+// Python tests use a prefix convention (`test_<name>.py`) which `endsWith` —
+// our standard suffix matcher — cannot express, so we check it separately.
+const TEST_FILE_BASENAME_PATTERNS: Array<{ prefix: string; ext: string }> = [
+  { prefix: 'test_', ext: '.py' },
 ];
 
 const TEST_RUNNER_DEPS = [
@@ -44,7 +48,11 @@ export const testsDetected: Check = {
   weight: 8,
   run(ctx) {
     const hasTestDir = TEST_DIRS.some((d) => hasFileUnder(ctx.files, d));
-    const hasTestFiles = TEST_FILE_SUFFIXES.some((s) => hasFileMatching(ctx.files, s));
+    const hasTestFiles =
+      TEST_FILE_SUFFIXES.some((s) => hasFileMatching(ctx.files, s)) ||
+      TEST_FILE_BASENAME_PATTERNS.some((p) =>
+        hasFileWithBasenamePattern(ctx.files, p.prefix, p.ext),
+      );
 
     let foundRunner: string | null = null;
     if (ctx.packageJson) {

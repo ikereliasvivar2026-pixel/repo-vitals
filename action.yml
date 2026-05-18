@@ -43,10 +43,13 @@ runs:
       run: |
         set -euo pipefail
         cd "${{ inputs.path }}"
-        OUT=$(mktemp)
+        OUT="$(mktemp --suffix=.json)"
         npx --yes repo-vitals@latest scan . --format json > "$OUT"
-        SCORE=$(node -e "console.log(require('$OUT').score)")
-        GRADE=$(node -e "console.log(require('$OUT').grade)")
+        # Use fs.readFileSync + JSON.parse instead of `require(OUT)` because
+        # node's CommonJS loader interprets files without a recognized
+        # extension as JavaScript, and would throw a SyntaxError on the JSON.
+        SCORE=$(node -e "console.log(JSON.parse(require('fs').readFileSync(process.argv[1], 'utf8')).score)" "$OUT")
+        GRADE=$(node -e "console.log(JSON.parse(require('fs').readFileSync(process.argv[1], 'utf8')).grade)" "$OUT")
         echo "score=$SCORE" >> "$GITHUB_OUTPUT"
         echo "grade=$GRADE" >> "$GITHUB_OUTPUT"
         echo "report-path=$OUT" >> "$GITHUB_OUTPUT"

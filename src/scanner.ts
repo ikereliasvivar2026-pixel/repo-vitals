@@ -121,8 +121,12 @@ async function runChecks(checks: Check[], ctx: CheckContext): Promise<CheckResul
 
 function assembleReport(repoPath: string, ctx: CheckContext, results: CheckResult[]): Report {
   const categories = groupByCategory(results);
-  const totalEarned = results.reduce((sum, r) => sum + r.earned, 0);
-  const totalWeight = results.reduce((sum, r) => sum + r.weight, 0);
+  // Skipped checks are not-applicable to this repo (e.g. package.json checks on a
+  // Python project) — they must not inflate the denominator, otherwise even a
+  // perfect non-JS repo can never reach A+.
+  const applicable = results.filter((r) => r.status !== 'skip');
+  const totalEarned = applicable.reduce((sum, r) => sum + r.earned, 0);
+  const totalWeight = applicable.reduce((sum, r) => sum + r.weight, 0);
   const score = totalWeight === 0 ? 0 : Math.round((totalEarned / totalWeight) * 100);
   return {
     repoPath,
@@ -156,8 +160,9 @@ function groupByCategory(results: CheckResult[]): CategoryReport[] {
     .map<CategoryReport | null>((category) => {
       const checks = byCat.get(category);
       if (!checks?.length) return null;
-      const earned = checks.reduce((s, r) => s + r.earned, 0);
-      const max = checks.reduce((s, r) => s + r.weight, 0);
+      const applicable = checks.filter((r) => r.status !== 'skip');
+      const earned = applicable.reduce((s, r) => s + r.earned, 0);
+      const max = applicable.reduce((s, r) => s + r.weight, 0);
       return {
         category,
         title: CATEGORY_TITLES[category],

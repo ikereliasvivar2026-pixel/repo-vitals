@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { scan } from './scanner.js';
 import { fix } from './fix/index.js';
 import { renderJson } from './reporters/json.js';
@@ -137,9 +138,13 @@ function stripAnsi(s: string): string {
   return s.replace(/\u001B\[[0-?]*[ -/]*[@-~]/g, '');
 }
 
+// `pathToFileURL` handles Windows drive letters and backslashes correctly,
+// where naive string interpolation produces `file://C:\...` which the URL
+// parser treats as having `C` as the host. Without this, the CLI silently
+// no-ops when invoked via `node dist/cli.js` on Windows.
 const isMain =
   process.argv[1] !== undefined &&
-  import.meta.url === new URL(`file://${path.resolve(process.argv[1])}`).href;
+  import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
 
 if (isMain) {
   buildProgram()

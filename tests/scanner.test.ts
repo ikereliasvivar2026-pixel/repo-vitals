@@ -81,6 +81,52 @@ describe('scan', () => {
     expect(tests?.status).toBe('pass');
   });
 
+  it('detects Python `test_*.py` files (prefix convention)', async () => {
+    repo = await makeRepo({ 'test_calculator.py': 'def test_add(): assert 1 + 1 == 2\n' });
+    const report = await scan({ cwd: repo });
+    const tests = report.checks.find((c) => c.id === 'tests-detected');
+    expect(tests?.status).toBe('pass');
+  });
+
+  it('excludes skipped checks from the score denominator so non-JS repos can reach A+', async () => {
+    // No package.json => discoverability checks (package-description, package-keywords,
+    // package-homepage) are skipped. The other applicable checks must determine the score
+    // without being dragged down by those skipped weights.
+    repo = await makeRepo({
+      'README.md':
+        '# Sample\n\n[![CI](https://img.shields.io/badge/ci-passing-green)](#)\n\n## Install\n\npip install x\n\n## Examples\n\n```py\nuse(x)\n```\n\n## Contributing\n\nSee CONTRIBUTING.md.\n\n## License\n\nMIT.\n',
+      LICENSE:
+        'MIT License\n\nCopyright (c) 2026 Test\n\nPermission is hereby granted, free of charge, to any person obtaining a copy',
+      'CONTRIBUTING.md': '# Contributing',
+      'CODE_OF_CONDUCT.md': '# CoC',
+      'SECURITY.md': '# Security',
+      'CHANGELOG.md': '# Changelog',
+      '.gitignore': '__pycache__\n',
+      '.editorconfig': 'root = true\n',
+      'pyproject.toml': '[tool.ruff]\n',
+      '.github/workflows/ci.yml': 'name: CI\non: push\n',
+      '.github/dependabot.yml': 'version: 2\nupdates: []',
+      '.github/PULL_REQUEST_TEMPLATE.md': 'PR',
+      '.github/ISSUE_TEMPLATE/bug.md': 'Bug',
+      'tests/test_calculator.py': 'def test_add(): assert 1 + 1 == 2\n',
+    });
+    const report = await scan({ cwd: repo });
+    const skipped = report.checks.filter((c) => c.status === 'skip');
+    expect(skipped.length).toBeGreaterThan(0);
+    // Skipped checks should still appear in the report (for visibility) but
+    // contribute zero to the denominator.
+    const applicableWeight = report.checks
+      .filter((c) => c.status !== 'skip')
+      .reduce((s, c) => s + c.weight, 0);
+    const expected = Math.round(
+      (report.checks.filter((c) => c.status !== 'skip').reduce((s, c) => s + c.earned, 0) /
+        applicableWeight) *
+        100,
+    );
+    expect(report.score).toBe(expected);
+    expect(report.score).toBeGreaterThanOrEqual(95);
+  });
+
   it('respects the --only option via ScanOptions', async () => {
     repo = await makeRepo({});
     const report = await scan({ cwd: repo, only: ['readme-present'] });

@@ -151,3 +151,25 @@ export function hasFileUnder(files: Set<string>, dir: string): boolean {
   }
   return false;
 }
+
+/**
+ * Returns true if any tracked file's basename starts with `prefix` AND ends
+ * with `extension`. Useful for prefix-based test-file conventions like
+ * Python's `test_*.py`, which {@link hasFileMatching} cannot express.
+ */
+export function hasFileWithBasenamePattern(
+  files: Set<string>,
+  prefix: string,
+  extension: string,
+): boolean {
+  const lowerPrefix = prefix.toLowerCase();
+  const lowerExt = extension.toLowerCase();
+  for (const f of files) {
+    const slash = f.lastIndexOf('/');
+    const base = slash === -1 ? f : f.slice(slash + 1);
+    if (base.startsWith(lowerPrefix) && base.endsWith(lowerExt) && base.length > lowerExt.length) {
+      return true;
+    }
+  }
+  return false;
+}
