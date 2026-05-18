@@ -1,0 +1,42 @@
+name: 💡 Feature request
+description: Suggest a new check, fixer, output format or improvement.
+title: 'feat: '
+labels: ['enhancement', 'triage']
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Start with the user pain — what's the situation today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How would you like repo-vitals to behave?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Anything else you tried or thought about.
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Area
+      multiple: false
+      options:
+        - New check
+        - New fixer
+        - CLI improvement
+        - GitHub Action improvement
+        - Programmatic API
+        - Documentation
+        - Other
+    validations:
+      required: true
