@@ -53,6 +53,12 @@ function rowFor(c: CheckResult): string {
   return `| ${emoji} | ${escapePipes(c.title)} | ${c.earned}/${c.weight} | ${escapePipes(c.message)} |`;
 }
 
+/**
+ * Escape a check message so it remains a single, well-formed markdown table
+ * cell. We escape backslashes first (so subsequent escapes are not themselves
+ * re-escaped), then pipes (which would otherwise terminate the cell), then
+ * collapse any embedded newlines into spaces.
+ */
 function escapePipes(s: string): string {
-  return s.replace(/\|/g, '\\|');
+  return s.replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
 }
