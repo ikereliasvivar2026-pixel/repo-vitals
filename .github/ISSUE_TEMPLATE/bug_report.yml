@@ -1,0 +1,69 @@
+name: 🐛 Bug report
+description: Something is broken in repo-vitals — let us help.
+title: 'bug: '
+labels: ['bug', 'triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Before filing, please check the [open issues](https://github.com/ikereliasvivar2026-pixel/repo-vitals/issues) to avoid duplicates.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear and concise description of the bug.
+      placeholder: When I run `repo-vitals scan` on …, the score is …
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: A minimal set of steps that reproduces the issue.
+      placeholder: |
+        1. `git clone https://github.com/example/sample`
+        2. `npx repo-vitals scan ./sample`
+        3. Observed score: 12. Expected: 80.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: repo-vitals version
+      description: Output of `repo-vitals --version`.
+      placeholder: '0.1.0'
+    validations:
+      required: true
+
+  - type: input
+    id: node
+    attributes:
+      label: Node.js version
+      placeholder: '20.10.0'
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: 'macOS 14.4 / Ubuntu 22.04 / Windows 11'
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Logs, screenshots, links to the failing repo, etc.

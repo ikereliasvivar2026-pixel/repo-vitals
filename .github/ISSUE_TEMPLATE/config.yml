@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Documentation
+    url: https://github.com/ikereliasvivar2026-pixel/repo-vitals#readme
+    about: Read the README and the docs/ folder before filing an issue.
+  - name: 💬 Discussions
+    url: https://github.com/ikereliasvivar2026-pixel/repo-vitals/discussions
+    about: Ask questions or share ideas in Discussions.
