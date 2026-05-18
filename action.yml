@@ -1,0 +1,67 @@
+name: 'Repo Vitals'
+description: 'Lighthouse for your open-source repos. Score your repo health and comment the report on PRs.'
+author: 'ikereliasvivar2026-pixel'
+branding:
+  icon: 'activity'
+  color: 'purple'
+
+inputs:
+  path:
+    description: 'Path to the repository to scan'
+    required: false
+    default: '.'
+  fail-under:
+    description: 'Fail the workflow if the score falls below this threshold (0–100)'
+    required: false
+    default: ''
+  comment-on-pr:
+    description: 'Post the markdown report as a PR comment'
+    required: false
+    default: 'true'
+  github-token:
+    description: 'Token used to post PR comments. Defaults to GITHUB_TOKEN.'
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  score:
+    description: 'Overall score (0–100)'
+  grade:
+    description: 'Letter grade (A+, A, B, C, D, F)'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Run repo-vitals
+      id: scan
+      shell: bash
+      run: |
+        set -euo pipefail
+        cd "${{ inputs.path }}"
+        OUT=$(mktemp)
+        npx --yes repo-vitals@latest scan . --format json > "$OUT"
+        SCORE=$(node -e "console.log(require('$OUT').score)")
+        GRADE=$(node -e "console.log(require('$OUT').grade)")
+        echo "score=$SCORE" >> "$GITHUB_OUTPUT"
+        echo "grade=$GRADE" >> "$GITHUB_OUTPUT"
+        echo "report-path=$OUT" >> "$GITHUB_OUTPUT"
+        npx --yes repo-vitals@latest scan . --format pretty
+        if [[ -n "${{ inputs.fail-under }}" ]]; then
+          npx --yes repo-vitals@latest scan . --fail-under "${{ inputs.fail-under }}" >/dev/null
+        fi
+
+    - name: Post PR comment
+      if: ${{ inputs.comment-on-pr == 'true' && github.event_name == 'pull_request' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        cd "${{ inputs.path }}"
+        BODY=$(mktemp)
+        npx --yes repo-vitals@latest scan . --format markdown > "$BODY"
+        gh pr comment "${{ github.event.pull_request.number }}" --body-file "$BODY" || true
