@@ -186,18 +186,18 @@ function setupBriefing() {
 // ====================================================================
 const WALL_POSITIONS = {
   suspects: [
-    { id: "marcos", x: 70, y: 180, rot: -3, tack: "red" },
-    { id: "daniel", x: 220, y: 230, rot: 2, tack: "yellow" },
-    { id: "sara", x: 70, y: 410, rot: 1, tack: "red" },
-    { id: "victor", x: 220, y: 460, rot: -2, tack: "blue" },
+    { id: "marcos", x: 60, y: 180, rot: -3, tack: "red" },
+    { id: "daniel", x: 220, y: 220, rot: 2, tack: "yellow" },
+    { id: "sara", x: 60, y: 430, rot: 1, tack: "red" },
+    { id: "victor", x: 220, y: 470, rot: -2, tack: "blue" },
   ],
   evidence: [
-    { id: "body", x: 540, y: 200, rot: -2, tack: "red" },
-    { id: "blood-stairs", x: 720, y: 200, rot: 3, tack: "red" },
-    { id: "bracelet", x: 870, y: 380, rot: -3, tack: "red" },
-    { id: "phone", x: 540, y: 500, rot: 4, tack: "yellow" },
-    { id: "keys", x: 720, y: 500, rot: -2, tack: "yellow" },
-    { id: "paint", x: 360, y: 500, rot: 3, tack: "red" },
+    { id: "body", x: 460, y: 180, rot: -2, tack: "red" },
+    { id: "blood-stairs", x: 640, y: 200, rot: 3, tack: "red" },
+    { id: "bracelet", x: 820, y: 180, rot: -3, tack: "red" },
+    { id: "phone", x: 460, y: 470, rot: 4, tack: "yellow" },
+    { id: "keys", x: 640, y: 480, rot: -2, tack: "yellow" },
+    { id: "paint", x: 820, y: 470, rot: 3, tack: "red" },
   ],
 };
 
