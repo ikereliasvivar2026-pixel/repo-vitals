@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="theme-color" content="#0a0805" />
+    <title>Criminal Files — Caso #1: La Piscina</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='10' fill='%230a0805'/><text x='50%25' y='58%25' text-anchor='middle' font-size='40' fill='%23e6c068' font-family='serif'>F</text></svg>"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <!-- ====================== Menú principal ====================== -->
+      <section id="screen-menu" class="screen active">
+        <div class="menu-bg"></div>
+        <canvas id="menu-particles" class="menu-particles"></canvas>
+        <div class="menu-content">
+          <h1 class="logo">
+            <span class="logo-mark">F</span><span class="logo-text"
+              >CRIMINAL FILES</span
+            >
+          </h1>
+          <p class="tagline">
+            Unidad Especial de Investigación · Expediente nº 0001
+          </p>
+
+          <div class="menu-grid">
+            <div class="menu-card selected" data-mode="story">
+              <h3>Modo Historia</h3>
+              <p>Resuelve casos guiados. Empieza con "La piscina"</p>
+            </div>
+            <div class="menu-card disabled">
+              <h3>Investigación Libre</h3>
+              <p>Caso aleatorio · Próximamente</p>
+            </div>
+            <div class="menu-card disabled">
+              <h3>Contrarreloj</h3>
+              <p>Resuelve antes que el tiempo · Próximamente</p>
+            </div>
+          </div>
+
+          <div class="difficulty">
+            <span class="difficulty-label">Dificultad:</span>
+            <button class="diff-btn" data-diff="cadet">Cadete</button>
+            <button class="diff-btn active" data-diff="detective">
+              Detective
+            </button>
+            <button class="diff-btn" data-diff="fbi">FBI</button>
+          </div>
+
+          <div class="menu-actions">
+            <button id="btn-start" class="btn-primary">▶ Iniciar caso</button>
+            <button id="btn-credits" class="btn-secondary">Créditos</button>
+          </div>
+
+          <div class="menu-footer">
+            <span>Click izquierdo en pruebas y sospechosos · Activa "Conectar" para tirar hilos · Cierra paneles con Esc</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================== Briefing ====================== -->
+      <section id="screen-briefing" class="screen">
+        <canvas id="briefing-particles" class="ambient-particles"></canvas>
+        <div class="briefing-frame">
+          <div class="briefing-header">
+            <span class="case-tag">EXPEDIENTE</span>
+            <span class="case-num">#0001 — CONFIDENCIAL</span>
+          </div>
+          <h2 id="briefing-title">El misterio de Splash Park</h2>
+          <div class="briefing-stamp">CASO ABIERTO</div>
+          <div id="briefing-body" class="briefing-body"></div>
+          <div class="briefing-actions">
+            <button id="btn-briefing-back" class="btn-secondary">
+              ← Menú
+            </button>
+            <button id="btn-briefing-go" class="btn-primary">
+              Entrar al despacho →
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================== Muro del caso (Mind Place) ====================== -->
+      <section id="screen-wall" class="screen">
+        <!-- Capa de iluminación y atmósfera -->
+        <div class="wall-room">
+          <div class="lamp-cone"></div>
+          <div class="vignette"></div>
+          <canvas id="wall-particles" class="ambient-particles"></canvas>
+
+          <!-- El corcho -->
+          <div class="corkboard" id="corkboard">
+            <!-- Hilos rojos (SVG) -->
+            <svg
+              class="strings"
+              id="strings"
+              viewBox="0 0 1600 900"
+              preserveAspectRatio="none"
+            >
+              <defs>
+                <filter id="stringShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur in="SourceAlpha" stdDeviation="1" />
+                  <feOffset dx="0" dy="1" result="off" />
+                  <feMerge>
+                    <feMergeNode in="off" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <g id="strings-group" filter="url(#stringShadow)"></g>
+            </svg>
+
+            <!-- Cabecera del caso -->
+            <div class="case-header">
+              <div class="case-header-stamp">CASO #0001</div>
+              <div class="case-header-title">LUCÍA VARGAS · 19</div>
+              <div class="case-header-sub">Homicidio · Splash Park</div>
+            </div>
+
+            <!-- Encabezados de columna -->
+            <div class="col-header" style="left:60px;top:140px;">SOSPECHOSOS</div>
+            <div class="col-header" style="left:460px;top:140px;">PRUEBAS</div>
+            <div class="col-header" style="left:1150px;top:140px;">CÁMARAS</div>
+
+            <!-- Recorte de prensa (esquina inferior central) -->
+            <div class="news-clipping" id="news-clipping">
+              <div class="news-header">DIARIO DE LA COSTA · 26 mayo</div>
+              <div class="news-headline">Joven hallada muerta en parque acuático</div>
+              <div class="news-body">
+                Una empleada del parque "Splash Park" apareció esta madrugada
+                flotando en la piscina principal. La policía no descarta
+                <b>ninguna hipótesis</b>. La forense valora un posible <i>golpe
+                previo</i> al ahogamiento.
+              </div>
+            </div>
+
+            <!-- Post-its -->
+            <div class="postit" style="left:420px;top:740px;transform:rotate(-3deg);">
+              "Hora muerte:<br/>01:00 - 03:00"
+            </div>
+            <div class="postit yellow" style="left:700px;top:750px;transform:rotate(3deg);">
+              ¿Por qué entró<br/>de noche?
+            </div>
+            <div class="postit pink" style="left:60px;top:700px;transform:rotate(-2deg);">
+              4 personas con<br/>llaves del recinto
+            </div>
+
+            <!-- TV / CRT cámaras -->
+            <div class="crt" id="crt-monitor">
+              <div class="crt-bezel">
+                <div class="crt-screen">
+                  <div class="crt-static"></div>
+                  <div class="crt-label">CCTV · SPLASH PARK</div>
+                  <div class="crt-rec">● REC</div>
+                  <div class="crt-time" id="crt-time">06:47:00</div>
+                  <div class="crt-scene">6 cámaras</div>
+                </div>
+                <div class="crt-button"></div>
+                <div class="crt-knob"></div>
+              </div>
+              <div class="crt-stand"></div>
+              <div class="crt-action">CLIC PARA REVISAR</div>
+            </div>
+
+            <!-- Polaroids de sospechosos (rellenados en JS) -->
+            <div id="suspects-area"></div>
+
+            <!-- Pruebas (rellenadas en JS) -->
+            <div id="evidence-area"></div>
+
+            <!-- Tablero de acusación: 3 huecos -->
+            <div class="accuse-zone" id="accuse-zone">
+              <div class="accuse-header">
+                <span class="accuse-stamp">VEREDICTO</span>
+                <span class="accuse-sub">Coloca tu hipótesis</span>
+              </div>
+              <div class="accuse-slots">
+                <div class="accuse-slot" data-slot="suspect">
+                  <div class="slot-label">¿QUIÉN?</div>
+                  <div class="slot-value">—</div>
+                </div>
+                <div class="accuse-slot" data-slot="motive">
+                  <div class="slot-label">¿POR QUÉ?</div>
+                  <div class="slot-value">—</div>
+                </div>
+                <div class="accuse-slot" data-slot="evidence">
+                  <div class="slot-label">¿LA PRUEBA?</div>
+                  <div class="slot-value">—</div>
+                </div>
+              </div>
+              <button id="btn-accuse" class="accuse-btn">FORMALIZAR ACUSACIÓN</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra inferior de herramientas -->
+        <div class="toolbar">
+          <button class="tool-btn" data-tool="journal">
+            <span class="tool-icon">📒</span>
+            <span class="tool-label">Diario</span>
+          </button>
+          <button class="tool-btn" data-tool="connect">
+            <span class="tool-icon">🧵</span>
+            <span class="tool-label">Conectar</span>
+            <span class="tool-state" id="connect-state">off</span>
+          </button>
+          <button class="tool-btn" data-tool="clear-strings">
+            <span class="tool-icon">✂️</span>
+            <span class="tool-label">Cortar hilos</span>
+          </button>
+          <div class="toolbar-spacer"></div>
+          <button class="tool-btn danger" data-tool="quit">
+            <span class="tool-icon">⏏</span>
+            <span class="tool-label">Salir</span>
+          </button>
+        </div>
+
+        <!-- Indicador de modo conectar -->
+        <div id="connect-banner" class="connect-banner hidden">
+          MODO HILO ACTIVO — Haz clic en una pieza, luego en otra para conectarlas
+          <button id="btn-cancel-connect">cancelar</button>
+        </div>
+      </section>
+
+      <!-- ====================== Examinar evidencia (modal) ====================== -->
+      <div id="modal-evidence" class="modal-overlay hidden">
+        <div class="modal-paper">
+          <button class="modal-close" data-close="evidence">✕</button>
+          <div class="examine-grid">
+            <div class="examine-photo">
+              <canvas id="examine-canvas" width="420" height="320"></canvas>
+              <div class="examine-stamp">EVIDENCIA</div>
+              <div class="examine-num" id="examine-num">#0</div>
+            </div>
+            <div class="examine-info">
+              <h3 id="examine-title">—</h3>
+              <p class="examine-meta" id="examine-meta">—</p>
+              <p id="examine-body">—</p>
+              <div class="examine-actions">
+                <button class="btn-secondary" id="btn-evidence-pick">
+                  Añadir al expediente
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================== Interrogatorio ====================== -->
+      <div id="modal-interview" class="modal-overlay hidden">
+        <div class="interview-room">
+          <div class="interview-back"></div>
+          <button class="modal-close" data-close="interview">✕</button>
+          <div class="interview-stage">
+            <div class="interview-photo">
+              <canvas id="interview-canvas" width="360" height="440"></canvas>
+              <div class="interview-stamp">SOSPECHOSO</div>
+            </div>
+            <div class="interview-panel">
+              <h3 id="interview-name">—</h3>
+              <div class="interview-role" id="interview-role">—</div>
+              <div class="interview-quote" id="interview-quote">—</div>
+              <div class="interview-options" id="interview-options"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================== Cámaras CCTV ====================== -->
+      <div id="modal-cameras" class="modal-overlay hidden">
+        <div class="cameras-room">
+          <button class="modal-close" data-close="cameras">✕</button>
+          <div class="cameras-header">
+            <h2>CCTV — Splash Park</h2>
+            <span class="cameras-sub">06 cámaras · grabaciones 00:00 → 06:00</span>
+          </div>
+          <div class="cameras-grid" id="cameras-grid"></div>
+          <div class="cameras-detail" id="cameras-detail">
+            <em>Selecciona una cámara para reproducir la grabación.</em>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================== Diario ====================== -->
+      <div id="modal-journal" class="modal-overlay hidden">
+        <div class="journal-book">
+          <button class="modal-close" data-close="journal">✕</button>
+          <div class="journal-tabs">
+            <button class="journal-tab active" data-tab="evidence">Pistas</button>
+            <button class="journal-tab" data-tab="suspects">Sospechosos</button>
+            <button class="journal-tab" data-tab="timeline">Cronología</button>
+            <button class="journal-tab" data-tab="notes">Notas</button>
+          </div>
+          <div class="journal-content" id="journal-content"></div>
+        </div>
+      </div>
+
+      <!-- ====================== Selector de hueco de acusación ====================== -->
+      <div id="modal-picker" class="modal-overlay hidden">
+        <div class="picker-card">
+          <button class="modal-close" data-close="picker">✕</button>
+          <h3 id="picker-title">Selecciona</h3>
+          <div class="picker-list" id="picker-list"></div>
+        </div>
+      </div>
+
+      <!-- ====================== Resultado ====================== -->
+      <section id="screen-result" class="screen">
+        <canvas id="result-particles" class="ambient-particles"></canvas>
+        <div class="result-card" id="result-card">
+          <div class="result-stamp" id="result-stamp">RESUELTO</div>
+          <h2 id="result-title"></h2>
+          <div class="result-body" id="result-body"></div>
+          <div class="result-actions">
+            <button id="btn-result-menu" class="btn-secondary">← Menú</button>
+            <button id="btn-result-retry" class="btn-primary">
+              Volver a intentarlo
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Loader -->
+      <div id="loader" class="loader">
+        <div class="loader-spin"></div>
+        <div class="loader-text">Cargando expediente…</div>
+      </div>
+
+      <!-- Audio toggle -->
+      <button id="audio-toggle" class="audio-toggle" title="Silenciar (M)">
+        🔊
+      </button>
+
+      <!-- Toast -->
+      <div id="toast" class="toast hidden"></div>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
