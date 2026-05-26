@@ -1,0 +1,13 @@
+{
+  "name": "criminal-files",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Criminal Files - juego web 2D de detective al estilo 'Mind Place' de Alan Wake 2",
+  "type": "module",
+  "scripts": {
+    "start": "npx --yes serve@14 -l 5173 .",
+    "build": "echo 'static site, nothing to build'",
+    "lint": "echo 'no linter configured'",
+    "test": "echo 'no tests configured'"
+  }
+}
